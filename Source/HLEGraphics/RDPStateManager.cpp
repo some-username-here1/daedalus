@@ -218,7 +218,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DAEDALUS_DL_ASSERT( (rdp_tile.size > 0) || (uls & 4) == 0, "Expecting an even Left for 4bpp formats (left is %f)", uls / 4.f );
 #endif
-	u32	tmem_lookup {(u32)(rdp_tile.tmem >> 4)};
+	u32	tmem_lookup = (u32)(rdp_tile.tmem >> 4);
 	SetValidEntry( tmem_lookup );
 
 	TimgLoadDetails & info = mTmemLoadInfo[ tmem_lookup ];
@@ -306,6 +306,16 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 	u32 tile_idx  = load.tile;
 	u32 ram_offset = g_TI.GetAddress16bpp(uls >> 2, ult >> 2);
 	u32	count = ((lrs - uls)>>2) + 1;
+	// Untested: See if uncommenting this effects the PS2's N64 emulation or the emulation as a whole
+	/*
+	u8*	   address	  = g_pu8RamBase + ram_offset;
+
+	const RDP_Tile & rdp_tile = mTiles[tile_idx];
+
+	u32 count = ((lrs - uls)>>2) + 1;
+
+	#ifdef DAEDALUS_DEBUG_DISPLAYLIST
+	*/
 	DAEDALUS_USE(count);
 	DAEDALUS_USE(lrt);
 

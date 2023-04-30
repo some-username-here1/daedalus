@@ -20,8 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_FB_H_
 #define HLEGRAPHICS_UCODES_UCODE_FB_H_
 
-#ifndef DAEDALUS_PSP
-static bool LoadFrameBuffer(u32 origin)
+//static bool LoadFrameBuffer(u32 origin)
+#if !defined(DAEDALUS_PSP) && !defined(DAEDALUS_PS2)
+static inline CRefPtr<CNativeTexture> LoadFrameBuffer(u32 origin)
 {
 	u32 width  = Memory_VI_GetRegister( VI_WIDTH_REG );
 	if( width == 0 )

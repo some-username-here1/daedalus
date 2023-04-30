@@ -17,8 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
-
 #ifndef PLUGINS_AUDIOPLUGIN_H_
 #define PLUGINS_AUDIOPLUGIN_H_
 
@@ -43,8 +41,9 @@ public:
 	virtual void			LenChanged() = 0;
 	virtual u32				ReadLength() = 0;
 	virtual EProcessResult	ProcessAList() = 0;
-#ifdef DAEDALUS_W32
+#if defined(DAEDALUS_W32) || defined(DAEDALUS_PS2)
 	virtual void			Update( bool wait ) = 0;
+	virtual void			StopAudio() = 0;
 #endif
 };
 

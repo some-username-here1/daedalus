@@ -243,7 +243,7 @@ void jpeg_decode_OB(OSTask *task)
     {
         s16 macroblock[6 * SUBBLOCK_SIZE];
         rdram_read_many_u16((u16*)macroblock, address, 6 * SUBBLOCK_SIZE);
-        DecodeMacroblockOB(macroblock, &y_dc, &u_dc, &v_dc, (qscale != 0) ? qtable : nullptr);
+        DecodeMacroblockOB(macroblock, &y_dc, &u_dc, &v_dc, (qscale != 0) ? qtable : (s16*)nullptr);
         EmitTilesMode2(EmitYUVTileLine, macroblock, address);
 
         address += (2 * 6 * SUBBLOCK_SIZE);
@@ -369,7 +369,6 @@ static void EmitTilesMode2(const tile_line_emitter_t emit_line, const s16 *macro
 
 static void DecodeMacroblockOB(s16 *macroblock, s32 *y_dc, s32 *u_dc, s32 *v_dc, const s16 *qtable)
 {
-
 	for (int sb = 0; sb < 6; ++sb)
 	{
 		s16 tmp_sb[SUBBLOCK_SIZE];

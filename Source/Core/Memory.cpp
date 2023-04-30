@@ -267,7 +267,7 @@ void Memory_Cleanup()
 
 static void Memory_Tlb_Hack()
 {
-	bool RomBaseKnown {RomBuffer::IsRomLoaded() && RomBuffer::IsRomAddressFixed()};
+	bool RomBaseKnown = RomBuffer::IsRomLoaded() && RomBuffer::IsRomAddressFixed();
 
 	const void * rom_address = RomBaseKnown ? RomBuffer::GetFixedRomBaseAddress() : nullptr;
 	if (rom_address != nullptr)
@@ -721,8 +721,8 @@ void MemoryUpdateDP( u32 flags )
 	// Ignore address, as this is only called with DPC_STATUS_REG write
 	// DBGConsole_Msg(0, "DP Status: 0x%08x", flags);
 
-	u32 dpc_status  = Memory_DPC_GetRegister(DPC_STATUS_REG);
-	bool unfreeze_task =  false;
+	u32  dpc_status    = Memory_DPC_GetRegister(DPC_STATUS_REG);
+	bool unfreeze_task = false;
 
 	// ToDO : Avoid branching
 	if (flags & DPC_CLR_XBUS_DMEM_DMA)			dpc_status &= ~DPC_STATUS_XBUS_DMEM_DMA;

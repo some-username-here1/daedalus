@@ -37,6 +37,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <limits.h>
 
 #define SIM_DOUBLES
+#elif defined(DAEDALUS_PS2)
+#include <math.h>
+
+#define SIM_DOUBLES
 #else
 #include <float.h>
 #define DAEDALUS_128BIT_MULT // On PSP we only handle 64bit mults for performance
@@ -59,7 +63,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define R4300_Rand()		FastRand()
 
-#if defined(DAEDALUS_PSP) && defined(SIM_DOUBLES)
+#if (defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)) && defined(SIM_DOUBLES)
 #define R4300_IsNaN(x) 		isnanf((x))
 #define R4300_Sqrt(x)		sqrtf((x))
 #define R4300_SqrtD(x)		sqrtf((x))
@@ -130,6 +134,23 @@ static const int		gNativeRoundingModes[ RM_NUM_MODES ] =
 inline void SET_ROUND_MODE( ERoundingMode mode )
 {
 	fesetround( gNativeRoundingModes[ mode ] );
+}
+
+#elif defined(DAEDALUS_PS2)
+
+static const int		gNativeRoundingModes[RM_NUM_MODES] =
+{
+	0,	// RM_ROUND,
+	1,	// RM_TRUNC,
+	2,	// RM_CEIL,
+	3,	// RM_FLOOR,
+};
+
+inline void SET_ROUND_MODE(ERoundingMode mode)
+{
+	//fpsetround(gNativeRoundingModes[mode]);
+	//printf("set round mode: %d\n", mode);
+	#warning fix me
 }
 
 #else
@@ -719,9 +740,9 @@ static void R4300_CALL_TYPE R4300_BGTZ( R4300_CALL_SIGNATURE ) 			// Branch on G
 	//if (gGPR[op_code.rs]._s32_0 > 0)
 	if (gGPR[op_code.rs]._s64 > 0)
 	{
-		s16 offset{ (s16)op_code.immediate };
-		u32 pc{ gCPUState.CurrentPC };
-		u32 new_pc{ pc + ((s32)offset<<2) + 4 };
+		s16 offset = (s16)op_code.immediate;
+		u32 pc = gCPUState.CurrentPC;
+		u32 new_pc = pc + ((s32)offset<<2) + 4;
 
 		SpeedHack(pc, new_pc);
 		CPU_TakeBranch( new_pc );
@@ -1451,18 +1472,18 @@ static void R4300_CALL_TYPE R4300_Special_DMULT( R4300_CALL_SIGNATURE ) 		// Dou
 	u64 op3 = rrt & 0xFFFFFFFF;
 	u64 op4 = (rrt >> 32) & 0xFFFFFFFF;
 
-u64 temp1 = op1 * op3;
-u64	temp2 = (temp1 >> 32) + op1 * op4;
-u64	temp3 = op2 * op3;
-u64	temp4 = (temp3 >> 32) + op2 * op4;
+	u64 temp1 = op1 * op3;
+	u64	temp2 = (temp1 >> 32) + op1 * op4;
+	u64	temp3 = op2 * op3;
+	u64	temp4 = (temp3 >> 32) + op2 * op4;
 
-u64	result1 = temp1 & 0xFFFFFFFF;
-u64	result2 = temp2 + (temp3 & 0xFFFFFFFF);
-u64	result3 = (result2 >> 32) + temp4;
-u64	result4 = (result3 >> 32);
+	u64	result1 = temp1 & 0xFFFFFFFF;
+	u64	result2 = temp2 + (temp3 & 0xFFFFFFFF);
+	u64	result3 = (result2 >> 32) + temp4;
+	u64	result4 = (result3 >> 32);
 
-s64	lo = result1 | (result2 << 32);
-s64	hi = (result3 & 0xFFFFFFFF) | (result4 << 32);
+	s64	lo = result1 | (result2 << 32);
+	s64	hi = (result3 & 0xFFFFFFFF) | (result4 << 32);
 	if (sign)
 	{
 		hi = ~hi;
@@ -1489,20 +1510,20 @@ static void R4300_CALL_TYPE R4300_Special_DMULTU( R4300_CALL_SIGNATURE ) 			// D
 	s64 rrs = gGPR[ op_code.rs ]._s64;
 	s64 rrt = gGPR[ op_code.rt ]._s64;
 
-u64	op1 = rrs & 0xFFFFFFFF;
-u64	op2 =(rrs >> 32) & 0xFFFFFFFF;
-u64	op3 = rrt & 0xFFFFFFFF;
-u64	op4 = (rrt >> 32) & 0xFFFFFFFF;
+	u64	op1 = rrs & 0xFFFFFFFF;
+	u64	op2 =(rrs >> 32) & 0xFFFFFFFF;
+	u64	op3 = rrt & 0xFFFFFFFF;
+	u64	op4 = (rrt >> 32) & 0xFFFFFFFF;
 
-u64	temp1 = op1 * op3;
-u64	temp2 = (temp1 >> 32) + op1 * op4;
-u64	temp3 = op2 * op3;
-u64	temp4 = (temp3 >> 32) + op2 * op4;
+	u64	temp1 = op1 * op3;
+	u64	temp2 = (temp1 >> 32) + op1 * op4;
+	u64	temp3 = op2 * op3;
+	u64	temp4 = (temp3 >> 32) + op2 * op4;
 
-u64	result1 = temp1 & 0xFFFFFFFF;
-u64	result2 = temp2 + (temp3 & 0xFFFFFFFF);
-u64	result3 = (result2 >> 32) + temp4;
-u64	result4 = (result3 >> 32);
+	u64	result1 = temp1 & 0xFFFFFFFF;
+	u64	result2 = temp2 + (temp3 & 0xFFFFFFFF);
+	u64	result3 = (result2 >> 32) + temp4;
+	u64	result4 = (result3 >> 32);
 
 	gCPUState.MultLo._s64 = result1 | (result2 << 32);
 	gCPUState.MultHi._s64 = (result3 & 0xFFFFFFFF) | (result4 << 32);
@@ -1756,7 +1777,7 @@ static void R4300_CALL_TYPE R4300_RegImm_BLTZ( R4300_CALL_SIGNATURE ) 			// Bran
 	//branch if rs < 0
 	if ( gGPR[ op_code.rs ]._s64 < 0 )
 	{
-		s16 offset= (s16)op_code.immediate;
+		s16 offset = (s16)op_code.immediate;
 		u32 pc = gCPUState.CurrentPC;
 		u32 new_pc = pc + ((s32)offset<<2) + 4;
 
@@ -1809,7 +1830,7 @@ static void R4300_CALL_TYPE R4300_RegImm_BGEZ( R4300_CALL_SIGNATURE ) 			// Bran
 	if ( gGPR[ op_code.rs ]._s64 >= 0 )
 	{
 		s16 offset = (s16)op_code.immediate;
-		u32 pc = gCPUState.CurrentPC ;
+		u32 pc = gCPUState.CurrentPC;
 		u32 new_pc = pc + ((s32)offset<<2) + 4;
 
 		SpeedHack(pc, new_pc);
@@ -1864,7 +1885,7 @@ static void R4300_CALL_TYPE R4300_Cop0_MFC0( R4300_CALL_SIGNATURE )
 	if ( op_code.fs == C0_CAUSE )
 	{
 		bool	mi_interrupt_set = (Memory_MI_GetRegister(MI_INTR_MASK_REG) & Memory_MI_GetRegister(MI_INTR_REG)) != 0;
-		bool	cause_int_3_set( (gCPUState.CPUControl[C0_CAUSE]._u32 & CAUSE_IP3) != 0);
+		bool	cause_int_3_set( (gCPUState.CPUControl[C0_CAUSE]._u32 & CAUSE_IP3) != 0 );
 
 		DAEDALUS_ASSERT( mi_interrupt_set == cause_int_3_set, "CAUSE_IP3 inconsistant with MI_INTR_REG" );
 
@@ -2553,7 +2574,7 @@ static void R4300_CALL_TYPE R4300_Cop1_S_CVT_D_2( R4300_CALL_SIGNATURE )
 
 	f32 fX = LoadFPR_Single( op_code.fs );
 
-	REG64 r ;
+	REG64 r;
 
 	r._f64 = (f64)fX;
 

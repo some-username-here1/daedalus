@@ -1037,7 +1037,7 @@ void DLParser_FillRect( MicroCodeCommand command )
 	{
 		CGraphicsContext::Get()->ClearZBuffer();
 
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 		if(gClearDepthFrameBuffer)
 #else
 		if(true)	//This always enabled for PC, this should be optional once we have a GUI to disable it!

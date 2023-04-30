@@ -107,9 +107,9 @@ static bool	GBIMicrocode_DetectVersionString( u32 data_base, u32 data_size, char
 
 static u32 GBIMicrocode_MicrocodeHash(u32 code_base, u32 code_size)
 {
+	//const u8 * ram( g_pu8RamBase );
 	const u8 * ram = g_pu8RamBase;
 	u32 hash = 0;
-
 	for (u32 i = 0; i < code_size; ++i)
 	{
 		hash = (hash << 4) + hash + ram[ (code_base+i) ^ U8_TWIDDLE ];   // Best hash ever!

@@ -56,6 +56,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // BUT leave PSP cache size untouched for now
 #ifdef DAEDALUS_PSP
 #define TRACE_SIZE 512
+#elif defined(DAEDALUS_PS2)
+#define TRACE_SIZE 512
 #else
 #define TRACE_SIZE 1024
 #endif
@@ -67,9 +69,9 @@ static const u32					gHotTraceThreshold = 10;	//How many times interpreter has t
 //typedef CMemoryPoolAllocator< std::pair< const u32, u32 > > MyAllocator;
 //std::map< u32, u32, std::less<u32>, MyAllocator >				gHotTraceCountMap;
 //std::map< u32, u32, std::less<u32>, boost::pool_allocator<std::pair< const u32, u32 > > >				gHotTraceCountMap;
-std::map< u32, u32 >				gHotTraceCountMap {};
-CFragmentCache						gFragmentCache {};
-static bool							gResetFragmentCache {false};
+std::map< u32, u32 >				gHotTraceCountMap;
+CFragmentCache						gFragmentCache;
+static bool							gResetFragmentCache = false;
 
 #ifdef DAEDALUS_DEBUG_DYNAREC
 std::map< u32, u32 >				gAbortedTraceReasons;
@@ -83,8 +85,8 @@ static void							CPU_CreateAndAddFragment();
 
 
 #ifdef DAEDALUS_PROFILE_EXECUTION
-u32 gFragmentLookupFailure {};
-u32 gFragmentLookupSuccess {};
+u32 gFragmentLookupFailure = 0;
+u32 gFragmentLookupSuccess = 0;
 #endif
 
 //*****************************************************************************
@@ -131,7 +133,7 @@ void R4300_CALL_TYPE CPU_InvalidateICacheRange( u32 address, u32 length )
 //*****************************************************************************
 template< bool TraceEnabled > DAEDALUS_FORCEINLINE void CPU_EXECUTE_OP()
 {
-
+	// Untested: Remove " = 0" to see if anything changes for the PS2's N64 emulation
 	u8 * p_Instruction = 0;
 	CPU_FETCH_INSTRUCTION( p_Instruction, gCPUState.CurrentPC );
 	OpCode op_code = *(OpCode*)p_Instruction;

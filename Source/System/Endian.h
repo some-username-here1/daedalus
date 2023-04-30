@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#define U16_TWIDDLE 0x2
 	#define U16H_TWIDDLE 0x1
 
-	#if defined( __GNUC__ ) && !defined(__clang__)
+	#if defined( __GNUC__ ) && !defined(__clang__) && !defined(DAEDALUS_PS2)
 
 		#define BSWAP32(x) __builtin_bswap32(x)
 		#define BSWAP16(x) __builtin_bswap16(x)

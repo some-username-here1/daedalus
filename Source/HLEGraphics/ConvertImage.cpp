@@ -301,7 +301,7 @@ struct SConvertIA4
 
 		if(width & 1)
 		{
-			u8 b {src[src_offset ^ F]};
+			u8 b = src[src_offset ^ F];
 
 			// Even
 			dst[width-1] = OutT( ThreeToEight[(b & 0xE0) >> 5],
@@ -345,7 +345,7 @@ struct SConvertI4
 		// Do two pixels at a time
 		for ( u32 x = 0; x+1 < width; x+=2 )
 		{
-			u8 b {src[src_offset ^ F]};
+			u8 b = src[src_offset ^ F];
 
 			// Even
 			dst[x + 0] = OutT( FourToEight[(b & 0xF0)>>4],
@@ -363,7 +363,7 @@ struct SConvertI4
 
 		if(width & 1)
 		{
-			u8 b {src[src_offset ^ F]};
+			u8 b = src[src_offset ^ F];
 
 			// Even
 			dst[width-1] = OutT( FourToEight[(b & 0xF0)>>4],
@@ -436,7 +436,7 @@ static void ConvertCI4_Row( NativePfCI44 * dst, const u8 * src, u32 src_offset, 
 	// Handle any remaining odd pixels
 	if( width & 1 )
 	{
-		u8 b {src[src_offset ^ F]};
+		u8 b = src[src_offset ^ F];
 
 		dst[ width/2 ].Bits = (b >> 4) | 0;
 	}
@@ -484,7 +484,7 @@ static  void ConvertCI8_Row_To_8888( NativePf8888 * dst, const u8 * src, u32 src
 {
 	for (u32 x = 0; x < width; x++)
 	{
-		u8 b     {src[src_offset ^ F]};
+		u8 b     = src[src_offset ^ F];
 		dst[ x ] = palette[ b ];	// Remember palette has already been swapped
 		src_offset++;
 	}

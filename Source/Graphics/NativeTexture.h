@@ -31,6 +31,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysGL/GL.h"
 #endif
 
+#ifdef DAEDALUS_PS2
+#include <gsKit.h>
+#endif
+
 class c32;
 
 class CNativeTexture : public CRefCounted
@@ -60,7 +64,7 @@ class CNativeTexture : public CRefCounted
 		inline const void *				GetData() const					{ return mpData; }
 		inline void *					GetData()						{ return mpData; }
 
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 		inline f32						GetScaleX() const				{ return mScale.x; }
 		inline f32						GetScaleY() const				{ return mScale.y; }
 #endif
@@ -81,6 +85,12 @@ class CNativeTexture : public CRefCounted
 
 #ifdef DAEDALUS_GL
 		GLuint				mTextureId;
+#endif
+
+#ifdef DAEDALUS_PS2
+		GSTEXTURE			mTexturePs2;
+		bool				mTextureConv;
+		v2					mScale;
 #endif
 
 #ifdef DAEDALUS_PSP

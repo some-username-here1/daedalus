@@ -28,8 +28,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Hash.h"
 #include "Utility/Profiler.h"
 
-static const char * const	gImageFormatNames[8] {"RGBA", "YUV", "CI", "IA", "I", "?1", "?2", "?3"};
-static const u32			gImageSizesInBits[4] {4, 8, 16, 32};
+static const char * const	gImageFormatNames[8] = {"RGBA", "YUV", "CI", "IA", "I", "?1", "?2", "?3"};
+static const u32			gImageSizesInBits[4] = {4, 8, 16, 32};
 
 const char * TextureInfo::GetFormatName() const
 {
@@ -65,6 +65,8 @@ u32 TextureInfo::GenerateHashValue() const
 		if (GetFormat() == G_IM_FMT_CI)
 		{
 			//Check palette changes too but only first 16 palette values//Corn
+
+			// Untested: Remove "g_pu8RamBase + " to see if anything changes for the PS2's N64 emulation or emulation as a whole
 			const u32* ptr_u32 = (u32*)(g_pu8RamBase + GetTlutAddress());
 			for (u32 z = 0; z < 8; z++) hash_value = ((hash_value << 1) | (hash_value >> 0x1F)) ^ *ptr_u32++;
 		}
@@ -75,6 +77,8 @@ u32 TextureInfo::GenerateHashValue() const
 		if (GetFormat() == G_IM_FMT_CI)
 		{
 			//Check palette changes too but only first 16 palette values//Corn
+			
+			// Untested: Remove "g_pu8RamBase + " to see if anything changes for the PS2's N64 emulation or emulation as a whole
 			const u32* ptr_u32 = (u32*)(g_pu8RamBase + GetTlutAddress());
 			for (u32 z = 0; z < 8; z++) hash_value = ((hash_value << 1) | (hash_value >> 0x1F)) ^ *ptr_u32++;
 		}

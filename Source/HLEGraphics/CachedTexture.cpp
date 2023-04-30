@@ -50,7 +50,7 @@ static NativePf8888			gPaletteBuffer[ 256 ];
 // On other platforms (e.g. OSX) updating textures is relatively inexpensive, so
 // we just skip the hashing process entirely, and update textures every frame
 // regardless of whether they've actually changed.
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 static const bool kUpdateTexturesEveryFrame = false;
 #else
 static const bool kUpdateTexturesEveryFrame = true;

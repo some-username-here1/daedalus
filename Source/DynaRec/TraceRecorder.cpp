@@ -395,7 +395,7 @@ void CTraceRecorder::Analyse( SRegisterUsageInfo & register_usage )
 
 	std::fill( reg_spans, reg_spans + NUM_N64_REGS, invalid_span );		// Set the interval to an invalid range
 
-	for( u32 i  = 0; i < mTraceBuffer.size(); ++i )
+	for( u32 i = 0; i < mTraceBuffer.size(); ++i )
 	{
 		const STraceEntry & ti( mTraceBuffer[ i ] );
 		const StaticAnalysis::RegisterUsage&	usage = ti.Usage;
@@ -428,9 +428,13 @@ void CTraceRecorder::Analyse( SRegisterUsageInfo & register_usage )
 
 		if( start <= end )
 		{
+#ifdef DAEDALUS_PS2
+			register_usage.SpanList.push_back(SRegisterSpan(EN64Reg(i), start, end));
+#else
 			SRegisterSpan	span( EN64Reg( i ), start, end );
 
 			register_usage.SpanList.push_back( span );
+#endif
 		}
 	}
 }

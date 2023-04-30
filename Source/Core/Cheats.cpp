@@ -150,9 +150,9 @@ static void CheatCodes_Apply(u32 index, u32 mode)
 		case 0x50:
 			{
 				skip		= true;
-				s32	count  = (s32)(address & 0x0000FF00) >> 8;	// repeat count
-				u32	offset =	(address & 0x000000FF);
-				u16	valinc =	value;
+				s32	count	= (s32)(address & 0x0000FF00) >> 8;	// repeat count
+				u32	offset	= (address & 0x000000FF);
+				u16	valinc	= value;
 
 				if( (num - 1) > 0)
 				{
@@ -269,8 +269,8 @@ bool CheatCodes_Read(const char *rom_name, const char *file, u8 countryID)
 	char			line[2048];
 	char  romname[256];/*, errormessage[400]*/;	//changed line length to 2048 previous was 256
 	bool			bfound;
-	u32				c1 {}, c2 {};
-	FILE			*stream {};
+	u32				c1 = 0, c2 = 0;
+	FILE			*stream;
 
 	// Add country ID to this ROM name, to avoid mixing cheat code of different region in the same entry
 	// Only the country id is important (first char)

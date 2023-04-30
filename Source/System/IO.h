@@ -35,8 +35,10 @@ namespace IO
 		bool		Move( const char * p_existing, const char * p_new );
 		bool		Delete( const char * p_file );
 		bool		Exists( const char * p_path );
-#ifdef DAEDALUS_PSP
-		int			Stat( const char *p_file, SceIoStat *stat );
+#if defined( DAEDALUS_PSP )
+		int			Stat(const char* p_file, SceIoStat* stat);
+#elif defined( DAEDALUS_PS2 )
+		//int			Stat(const char* p_file, iox_stat_t* stat);
 #endif
 
 	}
@@ -65,8 +67,8 @@ namespace IO
 		bool				RemoveFileSpec( char * p_path );
 		void				RemoveExtension( char * p_path );
 		void				AddExtension( char * p_path, const char * p_ext );
-#ifdef DAEDALUS_PSP
-		int					DeleteRecursive(const char* p_path, const char * p_extension);
+#if defined( DAEDALUS_PSP ) || defined( DAEDALUS_PS2 )
+		int					DeleteRecursive(const char* p_path, const char* p_extension);
 #endif
 
 		inline void SetExtension( char * p_path, const char * p_extension)
@@ -87,7 +89,7 @@ namespace IO
 	typedef SceUID FindHandleT;
 #elif defined( DAEDALUS_W32 )
 	typedef intptr_t FindHandleT;
-#elif defined( DAEDALUS_POSIX)
+#elif defined( DAEDALUS_POSIX ) || defined( DAEDALUS_PS2 )
 	typedef void * FindHandleT;
 #else
 #error Need to define FindHandleT for this platform

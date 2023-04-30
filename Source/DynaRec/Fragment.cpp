@@ -601,7 +601,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 #ifdef DAEDALUS_DEBUG_DYNAREC
 			printf("Speedhack complex %08x\n", trace[0].Address );
 #endif
-			p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
+			p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( (void *)CPU_SkipToNextEvent ) ) );
 		}
 	}
 
@@ -653,7 +653,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 						SprintOpCodeInfo( opinfo, trace[i+1].Address, trace[i+1].OpCode );
 						printf("0x%08x: <0x%08x> %s\n", trace[i+1].Address, trace[i+1].OpCode._u32, opinfo);
 
-						p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
+						p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( (void *)CPU_SkipToNextEvent ) ) );
 					}
 					break;
 
@@ -687,14 +687,14 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 #else
 			if(p_branch->SpeedHack == SHACK_SKIPTOEVENT)
 			{
-				p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
+				p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >((void*)CPU_SkipToNextEvent ) ) );
 			}
 #endif
 		}
 
 		CJumpLocation	branch_jump( nullptr );
  //PSP, We handle exceptions directly with _ReturnFromDynaRecIfStuffToDo
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 		p_generator->GenerateOpCode( ti, ti.BranchDelaySlot, p_branch, &branch_jump);
 #else
 		CJumpLocation	exception_handler_jump( p_generator->GenerateOpCode( ti, ti.BranchDelaySlot, p_branch, &branch_jump) );
@@ -767,7 +767,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 			}
 			*/
  //PSP, We handle exceptions directly with _ReturnFromDynaRecIfStuffToDo
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 			p_generator->GenerateOpCode( ti, true, nullptr, nullptr);
 #else
 			CJumpLocation	exception_handler_jump( p_generator->GenerateOpCode( ti, true, nullptr, nullptr) );
@@ -929,7 +929,7 @@ void DisassembleBuffer( const u8 * buf, int buf_size, FILE * fh )
 	}
 }
 
-#elif defined ( DAEDALUS_PSP )
+#elif defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 
 void DisassembleBuffer( const u8 * buf, int buf_size, FILE * fh )
 {

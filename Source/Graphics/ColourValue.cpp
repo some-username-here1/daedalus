@@ -227,8 +227,8 @@ c32	c32::Interpolate( c32 colour, c32 factor ) const
 
 	u8 r = InterpolateComponent( GetR(), colour.GetR(), factor_r );
 	u8 g = InterpolateComponent( GetG(), colour.GetG(), factor_g );
-	u8 a = InterpolateComponent( GetA(), colour.GetA(), factor_a );
 	u8 b = InterpolateComponent( GetB(), colour.GetB(), factor_b );
+	u8 a = InterpolateComponent( GetA(), colour.GetA(), factor_a );
 
 	return c32( r, g, b, a );
 }

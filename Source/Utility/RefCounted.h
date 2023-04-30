@@ -70,7 +70,7 @@ template< typename T >
 class CRefPtr
 {
 public:
-	CRefPtr() : mPtr( NULL ) {}
+	CRefPtr() : mPtr( (T*)NULL ) {}
 	CRefPtr( T * ptr ) : mPtr( ptr )				  { if( mPtr != NULL ) mPtr->AddRef(); }
 	CRefPtr( const CRefPtr & rhs ) : mPtr( rhs.mPtr ) { if( mPtr != NULL ) mPtr->AddRef(); }
 
@@ -106,6 +106,7 @@ public:
 	template <class U>
 	class _NoAddRefRelease : public U
 	{
+		_NoAddRefRelease() {}
 		private:
 			void	AddRef();
 			u32		Release();

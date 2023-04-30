@@ -20,17 +20,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <vector>
 #include <string>
 #include "System/Paths.h"
+#include "Utility/Macros.h"
 
 #include "System/IO.h"
 #include "Utility/StringUtil.h"
 #include "Utility/Translate.h"
 #include "Utility/VolatileMem.h"
 
+#ifdef DAEDALUS_PSP
 #include "SysPSP/Utility/PathsPSP.h"
+#endif
+
+#ifdef DAEDALUS_PS2
+#include "SysPS2/Utility/PathsPS2.h"
+#endif
 
 #include "Base/Macros.h"
 #define TRANSLATE_DUMP_VALUE 0xDAEDDAED
@@ -120,7 +128,11 @@ void Translate_Unload()
 bool	Translate_Init()
 {
 	// Init translations if available
+#ifdef DAEDALUS_PSP
 	Translate_Load( DAEDALUS_PSP_PATH("Languages/") );
+#elif defined(DAEDALUS_PS2)
+	Translate_Load( DAEDALUS_PS2_PATH("Languages/") );
+#endif
 
 	return /*gLanguage.empty() == 0*/ true;
 }

@@ -235,7 +235,7 @@ EProcessResult RSP_HLE_Jpeg(OSTask * task)
 
 EProcessResult RSP_HLE_CICX105(OSTask * task)
 {
-    const u32 sum {sum_bytes(g_pu8SpImemBase, 0x1000 >> 1)};
+    const u32 sum = sum_bytes(g_pu8SpImemBase, 0x1000 >> 1);
 
     switch(sum)
     {
@@ -244,8 +244,8 @@ EProcessResult RSP_HLE_CICX105(OSTask * task)
         case 0x9f2: /* CIC 7105 */
 			{
 				u32 i;
-				u8 * dst {g_pu8RamBase + 0x2fb1f0};
-				u8 * src {g_pu8SpImemBase + 0x120};
+				u8 * dst = g_pu8RamBase + 0x2fb1f0;
+				u8 * src = g_pu8SpImemBase + 0x120;
 
 				/* dma_read(0x1120, 0x1e8, 0x1e8) */
 				memcpy(g_pu8SpImemBase + 0x120, g_pu8RamBase + 0x1e8, 0x1f0);

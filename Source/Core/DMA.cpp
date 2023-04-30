@@ -57,7 +57,10 @@ void DMA_SP_CopyFromRDRAM()
 	u32 spmem_address = (spmem_address_reg&0x0FFF)		& ~7;	// Align to 8 byte boundary
 	u32 length = ((rdlen_reg    &0x0FFF) | 7)+1;				// Round up to 8 bytes
 
-#ifdef FAST_DMA_SP
+// Untested: See if adding " || defined(DAEDALUS_PS2)" to line 62 effects the PS2's N64 emulation
+//#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
+ #ifdef FAST_DMA_SP
+	// Ignore IMEM for speed (we don't do low-level RSP anyways on the PSP)
 	if((spmem_address_reg & 0x1000) == 0)
 	{
 		fast_memcpy(&g_pu8SpDmemBase[spmem_address], &g_pu8RamBase[rdram_address], length);
@@ -103,6 +106,8 @@ void DMA_SP_CopyToRDRAM()
 	u32 spmem_address = (spmem_address_reg&0x0FFF)		& ~7;	// Align to 8 byte boundary
 	u32 length = ((wrlen_reg    &0x0FFF) | 7)+1;				// Round up to 8 bytes
 
+// Untested: See if adding " || defined(DAEDALUS_PS2)" to line 111 effects the PS2's N64 emulation
+//#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 #ifdef FAST_DMA_SP
 	if((spmem_address_reg & 0x1000) == 0)
 	{
@@ -328,9 +333,9 @@ void DMA_PI_CopyToRDRAM()
 //*****************************************************************************
 void DMA_PI_CopyFromRDRAM()
 {
-	u32 mem_address = Memory_PI_GetRegister(PI_DRAM_ADDR_REG) & 0xFFFFFFFF;
-	u32 cart_address = Memory_PI_GetRegister(PI_CART_ADDR_REG)  & 0xFFFFFFFF;
-	u32 pi_length_reg = (Memory_PI_GetRegister(PI_RD_LEN_REG)  & 0xFFFFFFFF) + 1;
+	u32  mem_address    = Memory_PI_GetRegister(PI_DRAM_ADDR_REG) & 0xFFFFFFFF;
+	u32  cart_address   = Memory_PI_GetRegister(PI_CART_ADDR_REG) & 0xFFFFFFFF;
+	u32  pi_length_reg  = (Memory_PI_GetRegister(PI_RD_LEN_REG)   & 0xFFFFFFFF) + 1;
 	bool copy_succeeded = false;
 
 	if( pi_length_reg & 0x1 )

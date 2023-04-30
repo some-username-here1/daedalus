@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 u32 FlashStatus[2];
 u32 FlashRAM_Offset = 0;
+// Untested: Remove "static " to see if anything changes for the PS2's N64 emulation or emulation as a whole
 static u8 FlashBlock[128];
 
 enum TFlashRam_Types

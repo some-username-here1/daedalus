@@ -52,7 +52,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Thread.h"
 #include "System/Mutex.h"
 
-#ifdef DAEDALUS_W32
+#if defined(DAEDALUS_W32) || defined(DAEDALUS_PS2)
 #include "HLEAudio/AudioPlugin.h"
 #endif
 
@@ -72,9 +72,9 @@ std::vector< DBG_BreakPoint > g_BreakPoints;
 
 volatile u32 eventQueueLocked = 0;
 
-static bool			gCPURunning   = false;			// CPU is actively running
-u8 *				gLastAddress     = nullptr;
-std::string			gSaveStateFilename  = "";
+static bool			gCPURunning   = false;			    // CPU is actively running
+u8 *				gLastAddress       = nullptr;
+std::string			gSaveStateFilename = "";
 
 static bool			gCPUStopOnSimpleState = false;			// When stopping, try to stop in a 'simple' state (i.e. no RSP running and not in a branch delay slot)
 static Mutex		gSaveStateMutex;
@@ -119,7 +119,7 @@ void CPU_RegisterVblCallback(VblCallbackFn fn, void * arg)
 
 void CPU_UnregisterVblCallback(VblCallbackFn fn, void * arg)
 {
-	for (auto it = gVblCallbacks.begin(); it != gVblCallbacks.end(); ++it)
+	for (std::vector<VblCallback>::iterator it = gVblCallbacks.begin(); it != gVblCallbacks.end(); ++it)
 	{
 		if (it->Fn == fn && it->Arg == arg)
 		{
@@ -653,7 +653,7 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			gVerticalInterrupts++;
 
 			FramerateLimiter_Limit();
-#ifdef DAEDALUS_W32
+#if defined(DAEDALUS_W32) || defined(DAEDALUS_PS2)
 			if (gAudioPlugin != nullptr)
 				gAudioPlugin->Update(false);
 #endif

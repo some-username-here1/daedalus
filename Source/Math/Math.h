@@ -469,9 +469,89 @@ inline bool IsNaN_Double(double x)
 #define cosf(x)			vfpu_cosf((x))
 #define sincosf(x,s,c)	vfpu_sincos(x, s, c)
 
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+
+//Sign of Z coord from cross product normal, used for triangle front/back face culling //Corn
+//Note that we pass s32 even if it is a f32! The check for <= 0.0f is valid also with signed integers(bit31 in f32 is sign bit)
+//(((Bx - Ax)*(Cy - Ay) - (Cx - Ax)*(By - Ay)) * Aw * Bw * C.w)
+
+#if __GNUC__ > 3
+#define VUR "$"
+#else
+#define VUR ""
+#endif
+
+inline s32 vu0_TriNormSign(u8* Base, u32 v0, u32 v1, u32 v2)
+{
+	u8* A = Base + (v0 << 6);	//Base + v0 * sizeof( DaedalusVtx4 )
+	u8* B = Base + (v1 << 6);	//Base + v1 * sizeof( DaedalusVtx4 )
+	u8* C = Base + (v2 << 6);	//Base + v2 * sizeof( DaedalusVtx4 )
+	s32 result;
+
+	__asm__ volatile (
+		"lqc2		" VUR "vf1, 16+%1		\n"		//load projected V0 (A)
+		"lqc2		" VUR "vf2, 16+%2		\n"		//load projected V1 (B)
+		"lqc2		" VUR "vf3, 16+%3		\n"		//load projected V2 (C)
+		"vmul.w		" VUR "vf4, " VUR "vf2, " VUR "vf3	\n"		//BCw
+		"vmul.w		" VUR "vf5, " VUR "vf1, " VUR "vf3	\n"		//ACw
+		"vmul.w		" VUR "vf6, " VUR "vf1, " VUR "vf2	\n"		//ABw
+		"vmulw.xy	" VUR "vf1, " VUR "vf1, " VUR "vf4w	\n"		//scale Ax and Ay with BCw to avoid divide with Aw
+		"vmulw.xy	" VUR "vf2, " VUR "vf2, " VUR "vf5w	\n"		//scale Bx and By with ACw to avoid divide with Bw
+		"vmulw.xy	" VUR "vf3, " VUR "vf3, " VUR "vf6w	\n"		//scale Cx and Cy with ABw to avoid divide with Cw
+		"vsub.xy	" VUR "vf7, " VUR "vf1, " VUR "vf2	\n"		//Make 2D vector with A-B
+		"vsub.xy	" VUR "vf8, " VUR "vf2, " VUR "vf3	\n"		//Make 2D vector with B-C
+		"vopmula.xyz " VUR "ACC, " VUR "vf7, " VUR "vf8	\n"		//Calc 2x2 determinant with the two 2D vectors
+		"vopmsub.xyz " VUR "vf8, " VUR "vf8, " VUR "vf7	\n"
+		"vmul.w		" VUR "vf7, " VUR "vf4, " VUR "vf1	\n"		//create ABCw (BCw * Aw)
+		"vmr32.xyzw	" VUR "vf7, " VUR "vf7		\n"	
+		"vmul.z		" VUR "vf1, " VUR "vf7, " VUR "vf8	\n"		//determinant * ABCw
+		"qmfc2		%0, " VUR "vf1			\n"		//Sign determins FRONT or BACK face triangle(Note we pass a float as s32 here since -0+ check works regardless!)
+		"pcpyud		%0, %0, %0		\n"
+		"pextlw		%0, %0, %0		\n"
+		: "=r"(result) : "m"(*A), "m"(*B), "m"(*C));
+	return result;
+}
+
+inline void vu0_norm_3Dvec(float* x, float* y, float* z)
+{
+	__asm__ volatile (
+		"pextlw		$t0, %2, %0		\n"
+		"pextlw		$t0, %1, $t0	\n"
+		"qmtc2		$t0, " VUR "vf1		\n"
+		"vmul.xyz	" VUR "vf2, " VUR "vf1, " VUR "vf1	\n"
+		"vaddy.x	" VUR "vf2, " VUR "vf2, " VUR "vf2y	\n"
+		"vaddz.x	" VUR "vf2, " VUR "vf2, " VUR "vf2z	\n"
+		"vrsqrt		" VUR "Q, " VUR "vf0w, " VUR "vf2x	\n"
+		"vwaitq						\n"
+		"vmulq.xyz	" VUR "vf1, " VUR "vf1, " VUR "Q		\n"
+		"qmfc2		$t0, " VUR "vf1		\n"
+		"pextlw		%0, $t0, $t0	\n"
+		"pcpyud		%1, %0, $zero	\n"
+		"pextuw		%2, $t0, $t0	\n"
+		: "+r"(*x), "+r"(*y), "+r"(*z));
+}
+
+#undef VUR
+
+inline f64 trunc(f64 x) { return (x > 0) ? floor(x) : ceil(x); }
+inline f32 truncf(f32 x) { return (x > 0) ? floorf(x) : ceilf(x); }
+inline f64 round(f64 x) { return floor(x + 0.5); }
+inline f32 roundf(f32 x) { return floorf(x + 0.5f); }
+
+inline void sincosf(float x, float* s, float* c)
+{
+	*s = sinf(x);
+	*c = cosf(x);
+}
+
+inline float InvSqrt(float x)
+{
+	return 1.0f / sqrtf(x);
+}
+
 #else
 
-#ifdef DAEDALUS_W32
+#if defined(DAEDALUS_W32) || defined(DAEDALUS_PS2)
 inline f64 trunc(f64 x)				{ return (x>0) ? floor(x) : ceil(x); }
 inline f32 truncf(f32 x)			{ return (x>0) ? floorf(x) : ceilf(x); }
 inline f64 round(f64 x)				{ return floor(x + 0.5); }

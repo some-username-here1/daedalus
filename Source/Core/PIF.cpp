@@ -268,7 +268,7 @@ IController::IController() :
 	sceCtrlGetControllerPortInfo(&pinfo);
 #endif
 
-	for (u32 i = 0; i < NUM_CONTROLLERS; i++)
+	for ( u32 i = 0; i < NUM_CONTROLLERS; i++ )
 	{
 #ifdef DAEDALUS_VITA
 		mContPresent[i] = pinfo.port[i ? (i+1) : 0] != SCE_CTRL_TYPE_UNPAIRED;
@@ -355,7 +355,7 @@ void IController::Process()
 
 	u32 count = 0, channel = 0;
 
-	u32 *tmp {(u32*)mpPifRam};
+	u32 *tmp = (u32*)mpPifRam;
 	if ((tmp[0] == 0xFFFFFFFF) &&
 		(tmp[1] == 0xFFFFFFFF) &&
 		(tmp[2] == 0xFFFFFFFF) &&
@@ -632,7 +632,6 @@ u8 IController::CalculateDataCrc(const u8 * data)
     return crc;
 }
 
-
 // Returns new position to continue reading
 // i is the address of the first write info (after command itself)
 
@@ -778,6 +777,7 @@ void IController::n64_cic_nus_6105()
 		0x4, 0x1, 0xA, 0x7, 0xE, 0x5, 0xE, 0x1,
 		0xC, 0x9, 0x8, 0x5, 0x6, 0x3, 0xC, 0x9
 	};
+	// Untested: See if leaving "{}" here messes with the PS2's N64 emulation
 	char challenge[30] {}, response[30] {};
 	u32 i;
 	switch (mpPifRam[PIF_RAM_SIZE - 1])
